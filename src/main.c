@@ -19,6 +19,19 @@ static void activate (GtkApplication *app, gpointer user_data) {
     GtkWidget *loadProjectButton;
     GtkWidget *newProjectButton;
 
+    GtkCssProvider *provider = gtk_css_provider_new(); // makes everyting sexier with CSS
+    gtk_css_provider_load_from_string(provider,
+        "window { background-color: #000000ff; color: #eceff4; }"
+        "box { padding: 10px; }"
+        "label { font-size: 14px; font-weight: bold; color: #88c0d0; }"
+        "entry { border-radius: 5px; padding: 5px; background-color: #000000ff; color: #eceff4; border: 1px solid #5e81ac; }"
+        "entry:focus { border-color: #81a1c1; box-shadow: 0 0 5px #81a1c1; }"
+        "list { background-color: #000000ff; border-radius: 5px; }"
+        "list row { padding: 10px; border-bottom: 1px solid #4c566a; }"
+        "list row:hover { background-color: #434c5e; }"
+    );
+    gtk_style_context_add_provider_for_display(gdk_display_get_default(), GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
+
     window = gtk_application_window_new (app); // creates window and stores it in pointer
     gtk_window_set_title (GTK_WINDOW (window), "Track Plotter"); // sets window title
     gtk_window_set_default_size (GTK_WINDOW (window), 800, 600); // sets window size
@@ -35,7 +48,6 @@ static void activate (GtkApplication *app, gpointer user_data) {
     gtk_grid_attach (GTK_GRID (loadUnloadSelection), loadProjectButton, 0,0,1,1);
     gtk_grid_attach (GTK_GRID (loadUnloadSelection), newProjectButton, 1,0,1,1);
 
-    //g_signal_connect (loadProjectButton, "clicked", G_CALLBACK (/*ligar a loader*/), NULL);
     g_signal_connect (loadProjectButton, "clicked", G_CALLBACK(loaderWindow), app);
     g_signal_connect (newProjectButton, "clicked", G_CALLBACK(creatorWindow), app);
 
