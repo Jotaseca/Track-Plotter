@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <errno.h> // checks for errors
 #include <string.h> // for strlen.
+#include "trackplotter.c"
 
 // FOR NOW YOU HAVE TO CLICK ENTER FOR THE DATA TO BE INSERTED. NO FEEDBACK WILL BE GIVEN.
 
@@ -22,6 +23,7 @@
 // ----------------------------------------
 
 static char *projectT = NULL;
+static char projectPath[256];
 static float Gauge = 0.0;
 static float MaxHAngle = 0.0;
 static float MaxGForceLateral = 0.0;
@@ -41,15 +43,16 @@ static void projectCreator (GtkEntry *entry, gpointer user_data) { // is going r
         return;
     }
 
-    char projectPath[256];
     sprintf(projectPath, "data/%s", projectT);
     if (MKDIR(projectPath) == 0) {
         // creates folder with project name
         g_print("Project folder created.\n");
     } else if (errno == EEXIST) {
         g_print("Project folder already exists.\n");
+        return;
     } else {
         g_print("Failed to create project folder.\n");
+        return;
     }
 
     // Create the settings file on the newlu created folder
@@ -69,8 +72,14 @@ static void projectCreator (GtkEntry *entry, gpointer user_data) { // is going r
         g_print("Settings saved to %s\n", settingsPath);
     } else {
         g_print("Failed to save settings.\n");
+        return;
     }
 
+    GtkApplication *app = GTK_APPLICATION(user_data); // converts a generic pointer to an application pointer.
+    trackPlotterWindow(app);
+
+    GtkWidget *window = gtk_widget_get_ancestor(GTK_WIDGET(entry), GTK_TYPE_WINDOW); // gets the window.
+    if (window) { gtk_window_close(GTK_WINDOW(window)); } // closes the window.
 }
 
 static void on_entry_activate_string(GtkEntry *entry, gpointer user_data) {
@@ -199,7 +208,7 @@ static void creatorWindow(GtkApplication *button, gpointer user_data) {
 
     GtkWidget *saveAndStartButton = gtk_button_new_with_label("Save and Create Project");
 
-    g_signal_connect(saveAndStartButton, "clicked", G_CALLBACK(projectCreator), NULL);
+    g_signal_connect(saveAndStartButton, "clicked", G_CALLBACK(projectCreator), app);
 
     gtk_grid_attach(GTK_GRID(lowerButtonGrid), saveAndStartButton, 0,0,2,1);
 

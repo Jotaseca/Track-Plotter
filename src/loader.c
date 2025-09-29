@@ -31,7 +31,6 @@ void loadProjectSettings(const char *projectName) {
             } else if (strcmp(key, "gauge") == 0) {
                 Gauge = atof(value);
             }
-            // Add similar for other keys
         }
     }
     fclose(f);
